@@ -135,6 +135,48 @@ class Testes(unittest.TestCase):
         r_get_inexistente = requests.get('http://localhost:5000/turmas/9999')
         self.assertEqual(r_get_inexistente.status_code, 404)
 
+    def teste_atualiza_aluno(self):
+        # Primeiro, adicionamos um aluno para atualizar
+        r_post = requests.post('http://localhost:5000/alunos', json={'nome': 'AlunoAtualizar', 'id': 777, 'turma_id': 1})
+        self.assertEqual(r_post.status_code, 201)
+
+        # Agora, atualizamos o aluno
+        r_put = requests.put('http://localhost:5000/alunos/777', json={'nome': 'AlunoAtualizado'})
+        self.assertEqual(r_put.status_code, 200)
+
+        # Verificamos se o aluno foi atualizado corretamente
+        r_get = requests.get('http://localhost:5000/alunos/777')
+        self.assertEqual(r_get.status_code, 200)
+        self.assertEqual(r_get.json()['nome'], 'AlunoAtualizado')
+
+    def teste_atualiza_professor(self):
+        # Primeiro, adicionamos um professor para atualizar
+        r_post = requests.post('http://localhost:5000/professores', json={'nome': 'ProfessorAtualizar', 'id': 777})
+        self.assertEqual(r_post.status_code, 201)
+
+        # Agora, atualizamos o professor
+        r_put = requests.put('http://localhost:5000/professores/777', json={'nome': 'ProfessorAtualizado'})
+        self.assertEqual(r_put.status_code, 200)
+
+        # Verificamos se o professor foi atualizado corretamente
+        r_get = requests.get('http://localhost:5000/professores/777')
+        self.assertEqual(r_get.status_code, 200)
+        self.assertEqual(r_get.json()['nome'], 'ProfessorAtualizado')
+
+    def teste_atualiza_turma(self):
+        # Primeiro, adicionamos uma turma para atualizar
+        r_post = requests.post('http://localhost:5000/turmas', json={'descricao': 'TurmaAtualizar', 'id': 777, "professor_id": 1})
+        self.assertEqual(r_post.status_code, 201)
+
+        # Agora, atualizamos a turma
+        r_put = requests.put('http://localhost:5000/turmas/777', json={'descricao': 'TurmaAtualizada'})
+        self.assertEqual(r_put.status_code, 200)
+
+        # Verificamos se a turma foi atualizada corretamente
+        r_get = requests.get('http://localhost:5000/turmas/777')
+        self.assertEqual(r_get.status_code, 200)
+        self.assertEqual(r_get.json()['descricao'], 'TurmaAtualizada')
+
 
 def runTests():
         suite = unittest.defaultTestLoader.loadTestsFromTestCase(Testes)
