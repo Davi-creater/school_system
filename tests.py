@@ -68,7 +68,74 @@ class Testes(unittest.TestCase):
         if not achei_matematica:
             self.fail('aluno roberto nao apareceu na lista de alunos')
 
-        
+    def teste_deleta_aluno(self):
+        r_post = requests.post('http://localhost:5000/alunos', json={'nome': 'AlunoDeletar', 'id': 999, 'turma_id': 1})
+        self.assertEqual(r_post.status_code, 201)
+        r_delete = requests.delete('http://localhost:5000/alunos/999')
+        self.assertEqual(r_delete.status_code, 200)
+        r_get = requests.get('http://localhost:5000/alunos/999')
+        self.assertEqual(r_get.status_code, 404)
+
+    def teste_deleta_professor(self):
+        r_post = requests.post('http://localhost:5000/professores', json={'nome': 'ProfessorDeletar', 'id': 999})
+        self.assertEqual(r_post.status_code, 201)
+        r_delete = requests.delete('http://localhost:5000/professores/999')
+        self.assertEqual(r_delete.status_code, 200)
+        r_get = requests.get('http://localhost:5000/professores/999')
+        self.assertEqual(r_get.status_code, 404)
+
+    def teste_deleta_turma(self):
+        r_post = requests.post('http://localhost:5000/turmas', json={'descricao': 'TurmaDeletar', 'id': 999, "professor_id": 1})
+        self.assertEqual(r_post.status_code, 201)
+        r_delete = requests.delete('http://localhost:5000/turmas/999')
+        self.assertEqual(r_delete.status_code, 200)
+        r_get = requests.get('http://localhost:5000/turmas/999')
+        self.assertEqual(r_get.status_code, 404)
+
+
+    def teste_busca_aluno_por_id(self):
+        # Primeiro, adicionamos um aluno para buscar
+        r_post = requests.post('http://localhost:5000/alunos', json={'nome': 'AlunoBusca', 'id': 888, 'turma_id': 1})
+        self.assertEqual(r_post.status_code, 201)
+
+        # Agora, buscamos o aluno pelo ID
+        r_get = requests.get('http://localhost:5000/alunos/888')
+        self.assertEqual(r_get.status_code, 200)
+        self.assertEqual(r_get.json()['nome'], 'AlunoBusca')
+
+        # Busca por um ID inexistente
+        r_get_inexistente = requests.get('http://localhost:5000/alunos/9999')
+        self.assertEqual(r_get_inexistente.status_code, 404)
+
+    def teste_busca_professor_por_id(self):
+        # Primeiro, adicionamos um professor para buscar
+        r_post = requests.post('http://localhost:5000/professores', json={'nome': 'ProfessorBusca', 'id': 888})
+        self.assertEqual(r_post.status_code, 201)
+
+        # Agora, buscamos o professor pelo ID
+        r_get = requests.get('http://localhost:5000/professores/888')
+        self.assertEqual(r_get.status_code, 200)
+        self.assertEqual(r_get.json()['nome'], 'ProfessorBusca')
+
+        # Busca por um ID inexistente
+        r_get_inexistente = requests.get('http://localhost:5000/professores/9999')
+        self.assertEqual(r_get_inexistente.status_code, 404)
+
+    def teste_busca_turma_por_id(self):
+        # Primeiro, adicionamos uma turma para buscar
+        r_post = requests.post('http://localhost:5000/turmas', json={'descricao': 'TurmaBusca', 'id': 888, "professor_id": 1})
+        self.assertEqual(r_post.status_code, 201)
+
+        # Agora, buscamos a turma pelo ID
+        r_get = requests.get('http://localhost:5000/turmas/888')
+        self.assertEqual(r_get.status_code, 200)
+        self.assertEqual(r_get.json()['descricao'], 'TurmaBusca')
+
+        # Busca por um ID inexistente
+        r_get_inexistente = requests.get('http://localhost:5000/turmas/9999')
+        self.assertEqual(r_get_inexistente.status_code, 404)
+
+
 def runTests():
         suite = unittest.defaultTestLoader.loadTestsFromTestCase(Testes)
         unittest.TextTestRunner(verbosity=2,failfast=True).run(suite)
