@@ -116,15 +116,37 @@ def getAlunos():
     dados = info_alunos["alunos"]
     return jsonify(dados)
 
+@app.route('/alunos/<int:idAluno>', methods=['GET'])
+def getAlunoId(idAluno):
+    alunos = info_alunos["alunos"]   
+    for aluno in alunos:
+        if aluno['id'] == idAluno:
+            return jsonify(aluno)
+
+
 @app.route('/professores', methods=['GET'])
 def getProfessores():
     dados = info_professores["professores"]
     return jsonify(dados)
 
+@app.route('/professores/<int:idProfessor>', methods=['GET'])
+def getProfessorId(idProfessor):
+    professores = info_professores["professores"]   
+    for professor in professores:
+        if professor['id'] == idProfessor:
+            return jsonify(professor)
+
 @app.route('/turmas', methods=['GET'])
 def getTurmas():
     dados = info_turmas["turmas"]
     return jsonify(dados)
+
+@app.route('/turmas/<int:idTurma>', methods=['GET'])
+def getTurmaId(idTurma):
+    turmas = info_turmas["turmas"]   
+    for turma in turmas:
+        if turma['id'] == idTurma:
+            return jsonify(turma)
 #-----------------------------------GET------------------------------------
 
 #-----------------------------------DELETE------------------------------------
