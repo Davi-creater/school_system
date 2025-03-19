@@ -18,8 +18,8 @@ class Testes(unittest.TestCase):
             self.fail("voce nao definiu a pagina ")
 
     def teste_adiciona_alunos(self):
-        r = requests.post('http://localhost:5000/alunos',json={'nome':'fernando','id':1})
-        r = requests.post('http://localhost:5000/alunos',json={'nome':'roberto','id':2})
+        r = requests.post('http://localhost:5000/alunos',json={'nome':'fernando','id':1, 'turma_id':1})
+        r = requests.post('http://localhost:5000/alunos',json={'nome':'roberto','id':2,'turma_id':1})
         r_lista = requests.get('http://localhost:5000/alunos')
         lista_retornada = r_lista.json()
         achei_fernando = False
@@ -52,8 +52,8 @@ class Testes(unittest.TestCase):
             self.fail('aluno roberto nao apareceu na lista de professores')
     
     def teste_adiciona_turmas(self):
-        r = requests.post('http://localhost:5000/turmas',json={'descricao':'portugues','id':1})
-        r = requests.post('http://localhost:5000/turmas',json={'descricao':'matematica','id':2})
+        r = requests.post('http://localhost:5000/turmas',json={'descricao':'portugues','id':1, "professor_id": 1})
+        r = requests.post('http://localhost:5000/turmas',json={'descricao':'matematica','id':2, "professor_id": 1})
         r_lista = requests.get('http://localhost:5000/turmas')
         lista_retornada = r_lista.json()
         achei_portugues = False
