@@ -32,9 +32,9 @@ info_turmas = {
         {
             "id": 1,
             "nome": "Turma A",
-            "turno": "Matutino"
+            "turno": "Matutino",
             "professor_id": 1,
-            "ativo": True,
+            "ativo": True
         }
     ]
 }
