@@ -6,13 +6,11 @@ info_alunos = {
     "alunos": [
         {
             "id": 1,
-            "nome": "Davi",
-            "idade": "19",
             "turma_id": 1,
+            "nome": "Davi",
             "data_nascimento": "21/09/2005",
             "nota_primeiro_semestre": "10",
             "nota_segundo_sementre": "10",
-            "media_final": "10",
         }
     ]
 }
@@ -22,9 +20,9 @@ info_professores = {
         {
             "id": 1,
             "nome": "Professor Teste",
-            "idade": "40",
-            "materia": "Matemática",
-            "observacoes": "Ótimo professor",
+            "data_nascimento": "12/04/1992",
+            "disciplina": "Matemática",
+            "salario": "1500",
         }
     ]
 }
@@ -33,7 +31,8 @@ info_turmas = {
     "turmas": [
         {
             "id": 1,
-            "descricao": "Turma A",
+            "nome": "Turma A",
+            "turno": "Matutino"
             "professor_id": 1,
             "ativo": True,
         }
