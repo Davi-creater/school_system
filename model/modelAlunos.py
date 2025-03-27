@@ -8,7 +8,10 @@ info_alunos = {
             "data_nascimento": "21/09/2005",
             "nota_primeiro_semestre": "10",
             "nota_segundo_sementre": "10",
-            "media_final": "10",
+            "media_final": "10"
         }
     ]
 }
+
+class AlunoNaoEncontrado(Exception):
+    pass
