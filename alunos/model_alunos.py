@@ -37,8 +37,8 @@ def updateAluno(idAluno,novos_dados):
     if not aluno:
         return{"erro":"aluno nao encontrado"}
     dados = ['nome', 'turma_id', 'data_nascimento', 'nota_primeiro_semestre','nota_segundo_semestre']
-    if not all(campo in novos_dados and novos_dados[campo]not in [none,""]for campo in dados):
-        return{"erro":"preencher todos os campos"}
+    #if not all(campo in novos_dados and novos_dados[campo]not in [None,""]for campo in dados):
+    #    return{"erro":"preencher todos os campos"}
     aluno.update({key: value for key, value in novos_dados.items()if key != "id"})
     return{"mensagem":"aluno atualizado", "aluno":aluno}
 

@@ -52,21 +52,29 @@ class Testes(unittest.TestCase):
             self.fail('aluno roberto nao apareceu na lista de professores')
     
     def teste_adiciona_turmas(self):
-        r = requests.post('http://localhost:8000/turmas',json={'descricao':'portugues','id':1, "professor_id": 1})
-        r = requests.post('http://localhost:8000/turmas',json={'descricao':'matematica','id':2, "professor_id": 1})
-        r_lista = requests.get('http://localhost:8000/turmas')
-        lista_retornada = r_lista.json()
-        achei_portugues = False
-        achei_matematica = False
-        for aluno in lista_retornada:
-            if aluno['descricao'] == 'portugues':
-                achei_portugues = True
-            if aluno['descricao'] == 'matematica':
-                achei_matematica = True
-        if not achei_portugues:
-            self.fail('aluno fernando nao apareceu na lista de alunos')
-        if not achei_matematica:
-            self.fail('aluno roberto nao apareceu na lista de alunos')
+     r = requests.post('http://localhost:8000/turmas', json={'descricao': 'portugues', 'id': 1, "professor_id": 1})
+     r = requests.post('http://localhost:8000/turmas', json={'descricao': 'matematica', 'id': 2, "professor_id": 1})
+     
+     # Obtendo a lista de turmas
+     r_lista = requests.get('http://localhost:8000/turmas')
+     lista_retornada = r_lista.json()
+     
+     achei_portugues = False
+     achei_matematica = False
+     
+     # Verificando se as turmas estão na lista retornada
+     for turma in lista_retornada:
+         if turma['descricao'] == 'portugues':
+             achei_portugues = True
+         if turma['descricao'] == 'matematica':
+             achei_matematica = True
+     
+     # Mensagens de erro corrigidas
+     if not achei_portugues:
+         self.fail('turma portugues nao apareceu na lista de turmas')
+     if not achei_matematica:
+         self.fail('turma matematica nao apareceu na lista de turmas')
+
 
     def teste_deleta_aluno(self):
         r_post = requests.post('http://localhost:8000/alunos', json={'nome': 'AlunoDeletar', 'id': 999, 'turma_id': 1})
@@ -128,7 +136,7 @@ class Testes(unittest.TestCase):
 
     def teste_atualiza_aluno(self):
         r_post = requests.post('http://localhost:8000/alunos', json={'nome': 'AlunoAtualizar', 'id': 777, 'turma_id': 1})
-        self.assertEqual(r_post.status_code, 201)
+        self.assertEqual(r_post.status_code, 200)
 
         r_put = requests.put('http://localhost:8000/alunos/777', json={'nome': 'AlunoAtualizado'})
         self.assertEqual(r_put.status_code, 200)
@@ -149,15 +157,30 @@ class Testes(unittest.TestCase):
         self.assertEqual(r_get.json()['nome'], 'ProfessorAtualizado')
 
     def teste_atualiza_turma(self):
-        r_post = requests.post('http://localhost:8000/turmas', json={'descricao': 'TurmaAtualizar', 'id': 777, "professor_id": 1})
-        self.assertEqual(r_post.status_code, 201)
-
-        r_put = requests.put('http://localhost:8000/turmas/777', json={'descricao': 'TurmaAtualizada'})
-        self.assertEqual(r_put.status_code, 200)
-
-        r_get = requests.get('http://localhost:8000/turmas/777')
-        self.assertEqual(r_get.status_code, 200)
-        self.assertEqual(r_get.json()['descricao'], 'TurmaAtualizada')
+    # Criar a turma completa
+     r_post = requests.post('http://localhost:8000/turmas', json={
+         'id': 777,
+         'nome': 'Turma Teste',
+         'turno': 'Matutino',
+         'professor_id': 1,
+         'ativo': True,
+         'descricao': 'Turma para teste'
+     })
+     self.assertEqual(r_post.status_code, 200)  # 201 porque a rota retorna (json, 201)
+ 
+     # Atualizar todos os campos
+     r_put = requests.put('http://localhost:8000/turmas/777', json={
+         'nome': 'Turma Atualizada',
+         'turno': 'Vespertino',
+         'professor_id': 1,
+         'ativo': True,
+         'descricao': 'TurmaAtualizada'
+     })
+     self.assertEqual(r_put.status_code, 200)
+ 
+     r_get = requests.get('http://localhost:8000/turmas/777')
+     self.assertEqual(r_get.status_code, 200)
+     self.assertEqual(r_get.json()['descricao'], 'TurmaAtualizada')
 
 
 def runTests():

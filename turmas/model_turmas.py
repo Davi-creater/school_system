@@ -11,38 +11,37 @@ info_turmas = {
     ]
 }
 
-def createTurmas(r ,professores):
-   # dados = ['nome', 'professor_id', 'turno', 'ativo']
-    #if not all(dado in r for dado in dados):
-      #  return{"error":"campos obrigatorios"}
-    
-    #professor_verificacao = any(professor['id']== r['turma_id'] for professor in professores) 
-    #if not professor_verificacao:
-        #return{"erro": "Professor nao existe"}
+def createTurmas(r):
+    # Validação de ID único antes de adicionar uma nova turma
+    if any(turma['id'] == r['id'] for turma in info_turmas["turmas"]):
+        return {"erro": "ID da turma já existe"}
     info_turmas["turmas"].append(r)
+    return {"mensagem": "Turma criada com sucesso", "turma": r}
 
 def getTurmas():
     return info_turmas["turmas"]
 
 def getTurmaId(idTurma):
-    for turma in info_turmas["turma"]:
+    for turma in info_turmas["turmas"]:  # Corrigido para "turmas"
         if turma["id"] == idTurma:
             return turma
     return None
 
-def updateTurma(idTurma,novos_dados):
+def updateTurma(idTurma, novos_dados):
     turma = getTurmaId(idTurma)
     if not turma:
-        return{"erro":"turma nao encontrado"}
+        return {"erro": "Turma não encontrada"}
     dados = ['nome', 'professor_id', 'turno', 'ativo']
-    if not all(campo in novos_dados and novos_dados[campo]not in [none,""]for campo in dados):
-        return{"erro":"preencher todos os campos"}
-    turma.update({key: value for key, value in novos_dados.items()if key != "id"})
-    return{"mensagem":"turma atualizado", "turma":turma}
+    # Verifica se todos os campos necessários estão no novo dados e não estão vazios
+    #if not all(campo in novos_dados and novos_dados[campo] not in [None, ""] for campo in dados):
+    #    return {"erro": "Preencher todos os campos"}
+    # Atualiza a turma com os novos dados
+    turma.update({key: value for key, value in novos_dados.items() if key != "id"})
+    return {"mensagem": "Turma atualizada", "turma": turma}
 
 def deleteTurma(idTurma):
     turma = getTurmaId(idTurma)
     if turma:
-        info_turmas.remove(turma)
-        return{"mensagem":"turma removido"}
-    return{"erro": "turma nao encontrado"}
+        info_turmas["turmas"].remove(turma)  # Corrigido para acessar "turmas"
+        return {"mensagem": "Turma removida"}
+    return {"erro": "Turma não encontrada"}

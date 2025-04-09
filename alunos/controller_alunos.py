@@ -15,7 +15,7 @@ def create_aluno():
         create = createAlunos(r, turmas)
         return jsonify(create)
 
-@alunos_blueprint.route('/alunos<int:idAluno>', methods=['PUT'])
+@alunos_blueprint.route('/alunos/<int:idAluno>', methods=['PUT'])
 def update_aluno(idAluno):
      r = request.json
      aluno_existe = getAlunoId(idAluno)
@@ -25,12 +25,12 @@ def update_aluno(idAluno):
      return jsonify(update)
 
 
-@alunos_blueprint.route('/alunos<int:idAluno>', methods=['DELETE'])
+@alunos_blueprint.route('/alunos/<int:idAluno>', methods=['DELETE'])
 def delete_aluno(idAluno):
      delete = deleteAluno(idAluno)
      return jsonify(delete)
 
-@alunos_blueprint.route('/alunos<int:idAluno>', methods=['GET'])
+@alunos_blueprint.route('/alunos/<int:idAluno>', methods=['GET'])
 def get_aluno(idAluno):
      aluno = getAlunoId(idAluno)
      return jsonify(aluno)
