@@ -1,27 +1,22 @@
+
+from turmas.model_turmas import getTurmas
 info_alunos = {
-    "alunos": [
-        {
-            "id": 1,
-            "nome": "Davi",
-            "idade": "19",
-            "turma_id": 1,
-            "data_nascimento": "21/09/2005",
-            "nota_primeiro_semestre": "10",
-            "nota_segundo_sementre": "10",
-            "media_final": "10"
-        }
-    ]
+    "alunos": []
 }
 
-def createAlunos(r ,turmas ):
-    #dados = ['nome', 'turma_id', 'data_nascimento', 'nota_primeiro_semestre','nota_segundo_semestre']
-    #if not all(dado in r for dado in dados):
-        #return{"error":"campos obrigatorios"}
+def createAlunos(r):
     
-    turmas_verificacao = any(turma['id']== r['turma_id'] for turma in turmas) 
-    if not turmas_verificacao:
-        return{"erro": "Turma nao existe"}
+    turma_existe = any(turma['id'] == r['turma_id'] for turma in getTurmas()) 
+    if not turma_existe:
+        return {"erro": "Turma não existe"}
+
+    
+    if "nome" not in r or not r["nome"].strip():
+        return {"erro": "Nome não pode estar vazio"}
+
+    
     info_alunos["alunos"].append(r)
+    return {"mensagem": "Aluno criado com sucesso", "aluno": r}
 
 def getAlunos():
     return info_alunos["alunos"]
@@ -32,19 +27,17 @@ def getAlunoId(idAluno):
             return aluno
     return None
 
-def updateAluno(idAluno,novos_dados):
+def updateAluno(idAluno, novos_dados):
     aluno = getAlunoId(idAluno)
     if not aluno:
-        return{"erro":"aluno nao encontrado"}
-    dados = ['nome', 'turma_id', 'data_nascimento', 'nota_primeiro_semestre','nota_segundo_semestre']
-    #if not all(campo in novos_dados and novos_dados[campo]not in [None,""]for campo in dados):
-    #    return{"erro":"preencher todos os campos"}
-    aluno.update({key: value for key, value in novos_dados.items()if key != "id"})
-    return{"mensagem":"aluno atualizado", "aluno":aluno}
+        return {"erro": "Aluno não encontrado"}
+
+    aluno.update({key: value for key, value in novos_dados.items() if key != "id"})
+    return {"mensagem": "Aluno atualizado", "aluno": aluno}
 
 def deleteAluno(idAluno):
     aluno = getAlunoId(idAluno)
     if aluno:
-        info_alunos.remove(aluno)
-        return{"mensagem":"aluno removido"}
-    return{"erro": "aluno nao encontrado"}
+        info_alunos["alunos"].remove(aluno)
+        return {"mensagem": "Aluno removido"}
+    return {"erro": "Aluno não encontrado"}

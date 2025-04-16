@@ -38,6 +38,6 @@ def updateProfessor(idProfessor, novos_dados):
 def deleteProfessor(idProfessor):
     professor = getProfessorId(idProfessor)
     if professor:
-        info_professores.remove(professor)
-        return{"mensagem":"professor removido"}
-    return{"erro": "professor nao encontrado"}
+        info_professores["professores"].remove(professor) 
+        return {"mensagem": "professor removido"}
+    return {"erro": "professor nao encontrado"}
