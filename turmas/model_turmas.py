@@ -1,3 +1,20 @@
+from config import db
+
+class Turmas(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nome = db.Column(db.String(100))
+    turno = db.Column(db.String(30))
+    professor_id = db.Column(db.Integer(3))
+
+    def __init__(self, id, nome, turno, professor_id):
+        self.id = id
+        self.nome = nome
+        self.turno = turno
+        self.professor_id = professor_id
+
+    def to_dict(self):
+        return {'id': self.id, 'nome': self.nome, 'turno': self.turno, 'professor_id': self.professor_id}
+
 info_turmas = {
     "turmas": [
         {

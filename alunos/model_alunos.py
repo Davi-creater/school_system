@@ -1,5 +1,28 @@
-
+from config import db
 from turmas.model_turmas import getTurmas
+class Aluno(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nome = db.Column(db.String(100))
+    idade = db.Column(db.Interger(3))
+    data_nascimento = db.Column(db.String(10))
+    nota_primeiro_semestre = db.Column(db.Interger(3))
+    nota_segundo_semestre = db.Column(db.Interger(3))
+    media_final = db.Column(db.Interger(3))
+    turma_id = db.Column(db.Interger(3))
+
+    def __init__(self, id, nome, idade, data_nascimento, nota_primeiro_semestre, nota_segundo_semestre, media_final, turma_id):
+        self.id = id
+        self.nome = nome
+        self.idade = idade
+        self.data_nascimento = data_nascimento
+        self.nota_primeiro_semestre = nota_primeiro_semestre
+        self.nota_segundo_semestre = nota_segundo_semestre
+        self.media_final = media_final
+        self.turma_id = turma_id
+
+    def to_dict(self):
+        return {'id': self.id, 'nome': self.nome, 'idade': self.idade, 'data_nascimento': self.data_nascimento, 'nota_primeiro_semestre': self.nota_primeiro_semestre, 'nota_segundo_semestre': self.nota_segundo_semestre, 'media_final': self.media_final, 'turma_id': self.turma_id}
+
 info_alunos = {
     "alunos": []
 }
