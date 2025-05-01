@@ -19,46 +19,77 @@ class Professor(db.Model):
     def to_dict(self):
         return {'id': self.id, 'nome': self.nome, 'idade': self.idade, 'data_nascimento': self.data_nascimento, 'disciplina': self.disciplina, 'salario': self.salario}
 
-info_professores = {
-    "professores": [
-        {
-            "id": 1,
-            "nome": "Professor Teste",
-            "data_nascimento": "12/04/1992",
-            "disciplina": "Matemática",
-            "salario": "1500",
-        }
-    ]
-}
+# info_professores = {
+#     "professores": [
+#         {
+#             "id": 1,
+#             "nome": "Professor Teste",
+#             "data_nascimento": "12/04/1992",
+#             "disciplina": "Matemática",
+#             "salario": "1500",
+#         }
+#     ]
+# }
 
 def createProfessor(r):
-    info_professores["professores"].append(r)
-    return {"mensagem": "Professor criado com sucesso", "professor": r}
+    novo_professor = Professor(**r)
+    db.session.add(novo_professor)
+    db.session.commit()
+    return {"mensagem": r}
+    # info_professores["professores"].append(r)
+    # return {"mensagem": "Professor criado com sucesso", "professor": r}
 
 def getProfessores():
-    return info_professores["professores"]
+    professores = Professor.query.all()
+    return [professor.to_dict() for professor in professores]
+    # return info_professores["professores"]
 
 def getProfessorId(idProfessor):
-    for professor in info_professores["professores"]:
-        if professor["id"] == idProfessor:
-            return professor
-    return None
+    professor = Professor.query.get(idProfessor)
+    if not professor:
+        return{"error":"professor nao encontrado"}
+    return professor.to_dict()
+    # for professor in info_professores["professores"]:
+    #     if professor["id"] == idProfessor:
+    #         return professor
+    # return None
 
 def updateProfessor(idProfessor, novos_dados):
-    professor = getProfessorId(idProfessor)
+    professor = Professor.query.get(idProfessor)
     if not professor:
-        return {"erro": "professor não encontrado"}
+        return{"error": "Professor não encontrado"}
+    campos_validos = [
+        'nome',
+        'data_nascimento',
+        'salario',
+        'disciplina'
+    ]
 
-    dados = ['nome', 'data_nascimento', 'disciplina', 'salario']
-    #if not all(campo in novos_dados and novos_dados[campo] not in [None, ""] for campo in dados):
-    #    return {"erro": "preencher todos os campos"}
+    for campo in campos_validos:
+        if campo in novos_dados:
+            setattr(professor, campo, novos_dados[campo])
 
-    professor.update({key: value for key, value in novos_dados.items() if key != "id"})
-    return {"mensagem": "professor atualizado", "professor": professor}
+    db.session.commit()
+    # professor = getProfessorId(idProfessor)
+    # if not professor:
+    #     return {"erro": "professor não encontrado"}
+
+    # dados = ['nome', 'data_nascimento', 'disciplina', 'salario']
+    # #if not all(campo in novos_dados and novos_dados[campo] not in [None, ""] for campo in dados):
+    # #    return {"erro": "preencher todos os campos"}
+
+    # professor.update({key: value for key, value in novos_dados.items() if key != "id"})
+    # return {"mensagem": "professor atualizado", "professor": professor}
 
 def deleteProfessor(idProfessor):
-    professor = getProfessorId(idProfessor)
-    if professor:
-        info_professores["professores"].remove(professor) 
-        return {"mensagem": "professor removido"}
-    return {"erro": "professor nao encontrado"}
+    professor = Professor.query.get(idProfessor)
+    if not professor:
+        return{"error": "Professor não encontrado"}
+    db.session.delete(professor)
+    db.session.commit()
+
+    # professor = getProfessorId(idProfessor)
+    # if professor:
+    #     info_professores["professores"].remove(professor) 
+    #     return {"mensagem": "professor removido"}
+    # return {"erro": "professor nao encontrado"}
