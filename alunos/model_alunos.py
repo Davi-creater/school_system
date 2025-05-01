@@ -1,14 +1,15 @@
 from config import db
 from turmas.model_turmas import getTurmas
 class Aluno(db.Model):
+    __tablename__ = "alunos"
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(100))
-    idade = db.Column(db.Interger(3))
+    idade = db.Column(db.Integer)
     data_nascimento = db.Column(db.String(10))
-    nota_primeiro_semestre = db.Column(db.Interger(3))
-    nota_segundo_semestre = db.Column(db.Interger(3))
-    media_final = db.Column(db.Interger(3))
-    turma_id = db.Column(db.Interger(3))
+    nota_primeiro_semestre = db.Column(db.Integer)
+    nota_segundo_semestre = db.Column(db.Integer)
+    media_final = db.Column(db.Integer)
+    turma_id = db.Column(db.Integer)
 
     def __init__(self, id, nome, idade, data_nascimento, nota_primeiro_semestre, nota_segundo_semestre, media_final, turma_id):
         self.id = id
@@ -27,6 +28,7 @@ info_alunos = {
     "alunos": []
 }
 
+
 def createAlunos(r):
     
     turma_existe = any(turma['id'] == r['turma_id'] for turma in getTurmas()) 
@@ -37,30 +39,62 @@ def createAlunos(r):
     if "nome" not in r or not r["nome"].strip():
         return {"erro": "Nome não pode estar vazio"}
 
-    
-    info_alunos["alunos"].append(r)
+    novo_aluno = Aluno(**r)
+    db.session.add(novo_aluno)
+    db.session.commit()
+    #info_alunos["alunos"].append(r)
     return {"mensagem": "Aluno criado com sucesso", "aluno": r}
 
 def getAlunos():
-    return info_alunos["alunos"]
+    alunos =   Aluno.query.all()
+    return[aluno.to_dict() for aluno in alunos]
+    #return info_alunos["alunos"]
 
 def getAlunoId(idAluno):
-    for aluno in info_alunos["alunos"]:
-        if aluno["id"] == idAluno:
-            return aluno
-    return None
+    aluno = Aluno.query.get(idAluno)
+    if not aluno:
+        return{"error": "Aluno não encontrado"}
+    return aluno.to_dict()
+    # for aluno in info_alunos["alunos"]:
+    #     if aluno["id"] == idAluno:
+    #         return aluno
+    # return None
 
 def updateAluno(idAluno, novos_dados):
-    aluno = getAlunoId(idAluno)
+    aluno = Aluno.query.get(idAluno)
     if not aluno:
-        return {"erro": "Aluno não encontrado"}
+        return{"error": "Aluno não encontrado"}
+    campos_validos = [
+        'nome',
+        'idade',
+        'data_nascimento',
+        'nota_primeiro_semestre',
+        'nota_segundo_semestre',
+        'media_final',
+        'turma_id'
+    ]
 
-    aluno.update({key: value for key, value in novos_dados.items() if key != "id"})
-    return {"mensagem": "Aluno atualizado", "aluno": aluno}
+    for campo in campos_validos:
+        if campo in novos_dados:
+            setattr(aluno, campo, novos_dados[campo])
+
+    db.session.commit()
+    
+    # aluno = getAlunoId(idAluno)
+    # if not aluno:
+    #     return {"erro": "Aluno não encontrado"}
+
+    # aluno.update({key: value for key, value in novos_dados.items() if key != "id"})
+    # return {"mensagem": "Aluno atualizado", "aluno": aluno}
 
 def deleteAluno(idAluno):
-    aluno = getAlunoId(idAluno)
-    if aluno:
-        info_alunos["alunos"].remove(aluno)
-        return {"mensagem": "Aluno removido"}
-    return {"erro": "Aluno não encontrado"}
+    aluno = Aluno.query.get(idAluno)
+    if not aluno:
+        return{"error": "Aluno não encontrado"}
+    db.session.delete(aluno)
+    db.session.commit()
+    # aluno = getAlunoId(idAluno)
+    # if aluno:
+    #     info_alunos["alunos"].remove(aluno)
+    #     return {"mensagem": "Aluno removido"}
+    # return {"erro": "Aluno não encontrado"}

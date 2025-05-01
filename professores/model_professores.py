@@ -3,10 +3,10 @@ from config import db
 class Professor(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(100))
-    idade = db.Column(db.Interger(3))
+    idade = db.Column(db.Integer)
     data_nascimento = db.Column(db.String(10))
     disciplina = db.Column(db.String(100))
-    salario = db.Column(db.Interger(10))
+    salario = db.Column(db.Integer)
 
     def __init__(self, id, nome, idade, data_nascimento, disciplina, salario):
         self.id = id

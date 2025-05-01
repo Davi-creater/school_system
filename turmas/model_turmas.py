@@ -4,7 +4,7 @@ class Turmas(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(100))
     turno = db.Column(db.String(30))
-    professor_id = db.Column(db.Integer(3))
+    professor_id = db.Column(db.Integer)
 
     def __init__(self, id, nome, turno, professor_id):
         self.id = id
