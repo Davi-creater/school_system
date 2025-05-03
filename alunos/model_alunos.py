@@ -5,13 +5,14 @@ class Aluno(db.Model):
     nome = db.Column(db.String(100))
     idade = db.Column(db.Integer)
     data_nascimento = db.Column(db.String(10))
-    nota_primeiro_semestre = db.Column(db.Integer)
-    nota_segundo_semestre = db.Column(db.Integer)
-    media_final = db.Column(db.Integer)
-    turma_id = db.Column(db.Integer)
+    nota_primeiro_semestre = db.Column(db.Float)
+    nota_segundo_semestre = db.Column(db.Float)
+    media_final = db.Column(db.Float)
+    turma = db.relationship("Turmas", back_populates="alunos")
+    turma_id = db.Column(db.Integer, db.ForeignKey("turmas.id"), nullable=False)
 
-    def __init__(self, id, nome, idade, data_nascimento, nota_primeiro_semestre, nota_segundo_semestre, media_final, turma_id):
-        self.id = id
+    def __init__(self, nome, idade, data_nascimento, nota_primeiro_semestre, nota_segundo_semestre, media_final, turma_id):
+       
         self.nome = nome
         self.idade = idade
         self.data_nascimento = data_nascimento
@@ -38,7 +39,18 @@ def createAlunos(r):
     if "nome" not in r or not r["nome"].strip():
         return {"erro": "Nome não pode estar vazio"}
 
-    novo_aluno = Aluno(**r)
+    novo_aluno = Aluno(
+     nome=r['nome'],
+     idade=r['idade'],
+     data_nascimento=r['data_nascimento'],
+     nota_primeiro_semestre=float(r['nota_primeiro_semestre']),
+     nota_segundo_semestre=float(r['nota_segundo_semestre']),
+     turma_id=int(r['turma_id']),
+     media_final=(
+            float(r['nota_primeiro_semestre']) + float(r['nota_segundo_semestre'])
+        ) / 2,
+    )
+    
     db.session.add(novo_aluno)
     db.session.commit()
     #info_alunos["alunos"].append(r)

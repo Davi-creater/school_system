@@ -1,15 +1,18 @@
 from config import db
 
 class Professor(db.Model):
+    
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(100))
     idade = db.Column(db.Integer)
     data_nascimento = db.Column(db.String(10))
     disciplina = db.Column(db.String(100))
     salario = db.Column(db.Integer)
+    turmas = db.relationship("Turmas", back_populates="professor")
+    
 
-    def __init__(self, id, nome, idade, data_nascimento, disciplina, salario):
-        self.id = id
+    def __init__(self,nome, idade, data_nascimento, disciplina, salario):
+        
         self.nome = nome
         self.idade = idade
         self.data_nascimento = data_nascimento
@@ -17,79 +20,62 @@ class Professor(db.Model):
         self.salario = salario
 
     def to_dict(self):
-        return {'id': self.id, 'nome': self.nome, 'idade': self.idade, 'data_nascimento': self.data_nascimento, 'disciplina': self.disciplina, 'salario': self.salario}
+        return {
+            'id': self.id, 
+            'nome': self.nome, 
+            'idade': self.idade, 
+            'data_nascimento': self.data_nascimento, 
+            'disciplina': self.disciplina, 
+            'salario': self.salario
+        }
 
-# info_professores = {
-#     "professores": [
-#         {
-#             "id": 1,
-#             "nome": "Professor Teste",
-#             "data_nascimento": "12/04/1992",
-#             "disciplina": "Matemática",
-#             "salario": "1500",
-#         }
-#     ]
-# }
-
+# Função para criar um novo professor
 def createProfessor(r):
-    novo_professor = Professor(**r)
+    novo_professor = Professor(
+        
+        nome=r['nome'],
+        idade=int(r['idade']),
+        data_nascimento=r['data_nascimento'],
+        disciplina=r['disciplina'],
+        salario=int(r['salario']),
+    )
     db.session.add(novo_professor)
     db.session.commit()
-    return {"mensagem": r}
-    # info_professores["professores"].append(r)
-    # return {"mensagem": "Professor criado com sucesso", "professor": r}
+    return {"mensagem": "Professor criado com sucesso", "professor": novo_professor.to_dict()}
 
+# Função para obter todos os professores
 def getProfessores():
     professores = Professor.query.all()
     return [professor.to_dict() for professor in professores]
-    # return info_professores["professores"]
 
+# Função para obter um professor pelo ID
 def getProfessorId(idProfessor):
     professor = Professor.query.get(idProfessor)
     if not professor:
-        return{"error":"professor nao encontrado"}
+        return {"error": "Professor não encontrado"}
     return professor.to_dict()
-    # for professor in info_professores["professores"]:
-    #     if professor["id"] == idProfessor:
-    #         return professor
-    # return None
 
+# Função para atualizar os dados de um professor
 def updateProfessor(idProfessor, novos_dados):
     professor = Professor.query.get(idProfessor)
     if not professor:
-        return{"error": "Professor não encontrado"}
-    campos_validos = [
-        'nome',
-        'data_nascimento',
-        'salario',
-        'disciplina'
-    ]
+        return {"error": "Professor não encontrado"}
+    
+    campos_validos = ['nome', 'data_nascimento', 'salario', 'disciplina']
 
     for campo in campos_validos:
         if campo in novos_dados:
             setattr(professor, campo, novos_dados[campo])
 
     db.session.commit()
-    # professor = getProfessorId(idProfessor)
-    # if not professor:
-    #     return {"erro": "professor não encontrado"}
+    return {"mensagem": "Professor atualizado com sucesso", "professor": professor.to_dict()}
 
-    # dados = ['nome', 'data_nascimento', 'disciplina', 'salario']
-    # #if not all(campo in novos_dados and novos_dados[campo] not in [None, ""] for campo in dados):
-    # #    return {"erro": "preencher todos os campos"}
-
-    # professor.update({key: value for key, value in novos_dados.items() if key != "id"})
-    # return {"mensagem": "professor atualizado", "professor": professor}
-
+# Função para excluir um professor
 def deleteProfessor(idProfessor):
     professor = Professor.query.get(idProfessor)
     if not professor:
-        return{"error": "Professor não encontrado"}
+        return {"error": "Professor não encontrado"}
+    
     db.session.delete(professor)
     db.session.commit()
-
-    # professor = getProfessorId(idProfessor)
-    # if professor:
-    #     info_professores["professores"].remove(professor) 
-    #     return {"mensagem": "professor removido"}
-    # return {"erro": "professor nao encontrado"}
+    return {"mensagem": "Professor removido com sucesso"}

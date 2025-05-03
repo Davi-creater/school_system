@@ -8,8 +8,11 @@ alunos_blueprint = Blueprint('alunos', __name__)
 @alunos_blueprint.route('/alunos', methods=['POST'])
 def create_aluno():
     r = request.json
-    createAlunos(r)
-    return jsonify(r),201
+    response = createAlunos(r)
+    if 'erro' in response:
+        return jsonify(response), 400
+    return jsonify(response), 201
+
     # r = request.json
     # response = createAlunos(r)  
     # if 'erro' in response:

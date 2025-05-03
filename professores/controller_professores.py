@@ -3,80 +3,47 @@ from .model_professores import getProfessores, getProfessorId, createProfessor, 
 
 professores_blueprint = Blueprint('professores', __name__)  
 
-@professores_blueprint.route('/professores', methods=['POST'])
-def create_professor():
-    r = request.json
-    createProfessor(r)
-    return jsonify(r),201
-    # if not r.get('nome'):
-    #     return jsonify({"erro": "o campo 'nome' é obrigatório"}), 400
-    # create = createProfessor(r)
-    # return jsonify(create), 201  
-
-@professores_blueprint.route('/professores/<int:idProfessor>', methods=['PUT'])
-def update_professor(idProfessor):
-    r = request.json
-    updateProfessor(idProfessor, r)
-    return jsonify(getProfessorId(idProfessor))
-    # professor_existe = getProfessorId(idProfessor)
-    # if not professor_existe:
-    #     return jsonify({"error": "professor não encontrado"}), 404  
-    # update = updateProfessor(idProfessor, r)
-    # return jsonify(update), 200  
-
-@professores_blueprint.route('/professores/<int:idProfessor>', methods=['DELETE'])
-def delete_professor(idProfessor):
-    deleteProfessor(idProfessor)
-    # delete = deleteProfessor(idProfessor)
-    # return jsonify(delete), 200  
-
-@professores_blueprint.route('/professores/<int:idProfessor>', methods=['GET'])
-def get_professor(idProfessor):
-    professor = getProfessorId(idProfessor)
-    if not professor:
-        return jsonify({"error": "professor não encontrado"}), 404  
-    return jsonify(professor), 200  
-
-@professores_blueprint.route('/professores', methods=['GET'])
-def get_professores():
-    return jsonify(getProfessores()), 200  
-from flask import Blueprint, request, jsonify
-from .model_professores import getProfessores, getProfessorId, createProfessor, updateProfessor, deleteProfessor
-
-professores_blueprint = Blueprint('professores', __name__)  
-
+# Rota para criar um professor
 @professores_blueprint.route('/professores', methods=['POST'])
 def create_professor():
     r = request.json
     if not r.get('nome'):
         return jsonify({"erro": "o campo 'nome' é obrigatório"}), 400
-    create = createProfessor(r)
-    return jsonify(create), 201  
+    # Cria o professor no banco
+    createProfessor(r)
+    return jsonify({"mensagem": "Professor criado com sucesso", "professor": r}), 201  
 
+# Rota para atualizar um professor
 @professores_blueprint.route('/professores/<int:idProfessor>', methods=['PUT'])
 def update_professor(idProfessor):
     r = request.json
+    # Verifica se o professor existe
     professor_existe = getProfessorId(idProfessor)
     if not professor_existe:
         return jsonify({"error": "professor não encontrado"}), 404  
-    update = updateProfessor(idProfessor, r)
-    return jsonify(update), 200  
+    # Atualiza o professor
+    updateProfessor(idProfessor, r)
+    return jsonify({"mensagem": "Professor atualizado com sucesso", "professor": getProfessorId(idProfessor)}), 200  
 
+# Rota para deletar um professor
 @professores_blueprint.route('/professores/<int:idProfessor>', methods=['DELETE'])
 def delete_professor(idProfessor):
-    delete = deleteProfessor(idProfessor)
-    return "", 204
+    # Verifica se o professor existe antes de tentar deletá-lo
+    professor_existe = getProfessorId(idProfessor)
+    if not professor_existe:
+        return jsonify({"error": "professor não encontrado"}), 404
+    deleteProfessor(idProfessor)
+    return '', 204  # Deleção bem-sucedida, sem conteúdo
 
+# Rota para obter um professor específico
 @professores_blueprint.route('/professores/<int:idProfessor>', methods=['GET'])
 def get_professor(idProfessor):
     professor = getProfessorId(idProfessor)
-    return jsonify(professor)
+    if not professor:
+        return jsonify({"error": "professor não encontrado"}), 404  
+    return jsonify(professor), 200
 
-    # professor = getProfessorId(idProfessor)
-    # if not professor:
-    #     return jsonify({"error": "professor não encontrado"}), 404  
-    # return jsonify(professor), 200  
-
+# Rota para obter todos os professores
 @professores_blueprint.route('/professores', methods=['GET'])
 def get_professores():
     return jsonify(getProfessores()), 200  

@@ -4,10 +4,13 @@ class Turmas(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(100))
     turno = db.Column(db.String(30))
-    professor_id = db.Column(db.Integer)
+    professor = db.relationship("Professor", back_populates="turmas")
+    professor_id = db.Column(db.Integer, db.ForeignKey("professor.id"), nullable=False)
+    alunos = db.relationship("Aluno", back_populates="turma")
 
-    def __init__(self, id, nome, turno, professor_id):
-        self.id = id
+
+    def __init__(self, nome, turno, professor_id):
+
         self.nome = nome
         self.turno = turno
         self.professor_id = professor_id
@@ -31,9 +34,13 @@ class Turmas(db.Model):
 def createTurmas(r):
 
     
-    if any(turma['id'] == r['id'] for turma in getTurmas["turmas"]):
-         return {"erro": "ID da turma já existe"}
-    nova_turma = Turmas(**r)
+    # if any(turma['id'] == r['id'] for turma in getTurmas["turmas"]):
+    #      return {"erro": "ID da turma já existe"}
+    nova_turma = Turmas(
+        nome=r['nome'],
+        turno=r['turno'],
+        professor_id=int(r['professor_id']),
+    )
     db.session.add(nova_turma)
     db.session.commit()
     return{"mensagem":r}
