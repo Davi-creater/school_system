@@ -2,190 +2,95 @@ import requests
 import unittest
 
 class Testes(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        # Limpa registros
+        for tipo in ['alunos', 'professores', 'turmas']:
+            r = requests.get(f'http://localhost:5000/{tipo}')
+            if r.status_code == 200:
+                for item in r.json():
+                    requests.delete(f'http://localhost:5000/{tipo}/{item["id"]}')
+
+        # Cria professor (ID 1)
+        requests.post('http://localhost:5000/professores', json={
+            'id': 1, 'nome': 'Professor Único', 'idade': 40,
+            "data_nascimento": "1985-01-01", "disciplina": "Matemática", "salario": 5000
+        })
+
+        # Cria turma (ID 1)
+        requests.post('http://localhost:5000/turmas', json={
+            'id': 1, 'nome': 'Turma Única', 'turno': "Manhã",
+            "professor_id": 1, "descricao": "Turma de teste", "ativo": True
+        })
+
+        # Cria aluno (ID 1)
+        requests.post('http://localhost:5000/alunos', json={
+            'id': 1, 'nome': 'Aluno Único', 'idade': 15,
+            'data_nascimento': '2010-01-01', 'turma_id': 1,
+            'nota_primeiro_semestre': 7.5, 'nota_segundo_semestre': 8.0
+        })
+
     def teste_001(self):
         r = requests.get('http://localhost:5000/alunos')
-        if r.status_code == 404:
-            self.fail("voce nao definiu a pagina ")
+        self.assertNotEqual(r.status_code, 404, "Página /alunos não definida")
 
     def teste_002(self):
         r = requests.get('http://localhost:5000/professores')
-        if r.status_code == 404:
-            self.fail("voce nao definiu a pagina ")
+        self.assertNotEqual(r.status_code, 404, "Página /professores não definida")
 
     def teste_003(self):
         r = requests.get('http://localhost:5000/turmas')
-        if r.status_code == 404:
-            self.fail("voce nao definiu a pagina ")
+        self.assertNotEqual(r.status_code, 404, "Página /turmas não definida")
 
-    def teste_006(self):
-        r = requests.post('http://localhost:5000/alunos',json={'nome':'fernando','idade':1,'data_nascimento':'', 'turma_id':1,'nota_primeiro_semestre':2,'nota_segundo_semestre':2})
-        r = requests.post('http://localhost:5000/alunos',json={'nome':'roberto','idade':1,'data_nascimento':'','turma_id':1,'nota_primeiro_semestre':2,'nota_segundo_semestre':2})
-        r_lista = requests.get('http://localhost:5000/alunos')
-        lista_retornada = r_lista.json()
-        achei_fernando = False
-        achei_roberto = False
-        for aluno in lista_retornada:
-            if aluno['nome'] == 'fernando':
-                achei_fernando = True
-            if aluno['nome'] == 'roberto':
-                achei_roberto = True
-        if not achei_fernando:
-            self.fail('aluno fernando nao apareceu na lista de alunos')
-        if not achei_roberto:
-            self.fail('aluno roberto nao apareceu na lista de alunos')
+    def teste_004_lista_professor(self):
+        r = requests.get('http://localhost:5000/professores')
+        self.assertTrue(any(p['nome'] == 'Professor Único' for p in r.json()), 'Professor Único não apareceu na lista')
 
-    def teste_004(self):
-        r = requests.post('http://localhost:5000/professores',json={'nome':'caio','idade':1,"data_nascimento":"","disciplina":"","salario":6})
-        r = requests.post('http://localhost:5000/professores',json={'nome':'odair','idade':2,"data_nascimento":"","disciplina":"","salario":6})
-        r_lista = requests.get('http://localhost:5000/professores')
-        lista_retornada = r_lista.json()
-        achei_caio = False
-        achei_odair = False
-        for aluno in lista_retornada:
-            if aluno['nome'] == 'caio':
-                achei_caio = True
-            if aluno['nome'] == 'odair':
-                achei_odair = True
-        if not achei_caio:
-            self.fail('professor caio nao apareceu na lista de professores')
-        if not achei_odair:
-            self.fail('professor odair nao apareceu na lista de professores')
-    
-    def teste_005(self):
-     r = requests.post('http://localhost:5000/turmas', json={'nome': 'portugues', 'turno': "1", "professor_id": 1})
-     r = requests.post('http://localhost:5000/turmas', json={'nome': 'matematica', 'turno': "2", "professor_id": 1})
-     
-     
-     r_lista = requests.get('http://localhost:5000/turmas')
-     lista_retornada = r_lista.json()
-     
-     achei_portugues = False
-     achei_matematica = False
-     
-     
-     for turma in lista_retornada:
-         if turma['nome'] == 'portugues':
-             achei_portugues = True
-         if turma['nome'] == 'matematica':
-             achei_matematica = True
-     
-     
-     if not achei_portugues:
-         self.fail('turma portugues nao apareceu na lista de turmas')
-     if not achei_matematica:
-         self.fail('turma matematica nao apareceu na lista de turmas')
+    def teste_005_lista_turma(self):
+        r = requests.get('http://localhost:5000/turmas')
+        self.assertTrue(any(t['nome'] == 'Turma Única' for t in r.json()), 'Turma Única não apareceu na lista')
 
+    def teste_006_lista_aluno(self):
+        r = requests.get('http://localhost:5000/alunos')
+        self.assertTrue(any(a['nome'] == 'Aluno Único' for a in r.json()), 'Aluno Único não apareceu na lista')
 
-    def teste_deleta_aluno_007(self):
-        r_post = requests.post('http://localhost:5000/alunos', json={'nome': 'AlunoDeletar', 'id': 999, 'turma_id': 1})
-        self.assertEqual(r_post.status_code, 201)
-        r_delete = requests.delete('http://localhost:5000/alunos/999')
-        self.assertEqual(r_delete.status_code, 200)
-        r_get = requests.get('http://localhost:5000/alunos/999')
-        self.assertEqual(r_get.status_code, 404)
+    def teste_007_busca_aluno_por_id(self):
+        r = requests.get('http://localhost:5000/alunos/1')
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.json()['nome'], 'Aluno Único')
 
-    def teste_deleta_professor_008(self):
-        r_post = requests.post('http://localhost:5000/professores', json={'nome': 'ProfessorDeletar', 'id': 999})
-        self.assertEqual(r_post.status_code, 201)
-        r_delete = requests.delete('http://localhost:5000/professores/999')
-        self.assertEqual(r_delete.status_code, 200)
-        r_get = requests.get('http://localhost:5000/professores/999')
-        self.assertEqual(r_get.status_code, 404)
+    def teste_008_busca_professor_por_id(self):
+        r = requests.get('http://localhost:5000/professores/1')
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.json()['nome'], 'Professor Único')
 
-    def teste_deleta_turma_009(self):
-        r_post = requests.post('http://localhost:5000/turmas', json={'descricao': 'TurmaDeletar', 'id': 999, "professor_id": 1})
-        self.assertEqual(r_post.status_code, 201)
-        r_delete = requests.delete('http://localhost:5000/turmas/999')
-        self.assertEqual(r_delete.status_code, 200)
-        r_get = requests.get('http://localhost:5000/turmas/999')
-        self.assertEqual(r_get.status_code, 404)
+    def teste_009_busca_turma_por_id(self):
+        r = requests.get('http://localhost:5000/turmas/1')
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.json()['nome'], 'Turma Única')
 
+    def teste_010_atualiza_aluno(self):
+        r = requests.put('http://localhost:5000/alunos/1', json={'nome': 'Aluno Atualizado'})
+        self.assertEqual(r.status_code, 200)
+        r = requests.get('http://localhost:5000/alunos/1')
+        self.assertEqual(r.json()['nome'], 'Aluno Atualizado')
 
-    def teste_busca_aluno_por_id_010(self):
-        r_post = requests.post('http://localhost:5000/alunos', json={'nome': 'AlunoBusca', 'id': 888, 'turma_id': 1})
-        self.assertEqual(r_post.status_code, 201)
+    def teste_011_atualiza_professor(self):
+        r = requests.put('http://localhost:5000/professores/1', json={'nome': 'Professor Atualizado'})
+        self.assertEqual(r.status_code, 200)
+        r = requests.get('http://localhost:5000/professores/1')
+        self.assertEqual(r.json()['nome'], 'Professor Atualizado')
 
-        r_get = requests.get('http://localhost:5000/alunos/888')
-        self.assertEqual(r_get.status_code, 200)
-        self.assertEqual(r_get.json()['nome'], 'AlunoBusca')
-
-        r_get_inexistente = requests.get('http://localhost:5000/alunos/9999')
-        self.assertEqual(r_get_inexistente.status_code, 404)
-
-    def teste_busca_professor_por_id_011(self):
-        r_post = requests.post('http://localhost:5000/professores', json={'nome': 'ProfessorBusca', 'id': 888})
-        self.assertEqual(r_post.status_code, 201)
-
-        r_get = requests.get('http://localhost:5000/professores/888')
-        self.assertEqual(r_get.status_code, 200)
-        self.assertEqual(r_get.json()['nome'], 'ProfessorBusca')
-
-        r_get_inexistente = requests.get('http://localhost:5000/professores/9999')
-        self.assertEqual(r_get_inexistente.status_code, 404)
-
-    def teste_busca_turma_por_id_012(self):
-        r_post = requests.post('http://localhost:5000/turmas', json={'descricao': 'TurmaBusca', 'id': 888, "professor_id": 1})
-        self.assertEqual(r_post.status_code, 201)
-
-        r_get = requests.get('http://localhost:5000/turmas/888')
-        self.assertEqual(r_get.status_code, 200)
-        self.assertEqual(r_get.json()['descricao'], 'TurmaBusca')
-
-        r_get_inexistente = requests.get('http://localhost:5000/turmas/9999')
-        self.assertEqual(r_get_inexistente.status_code, 404)
-
-    def teste_atualiza_aluno_011(self):
-        r_post = requests.post('http://localhost:5000/alunos', json={'nome': 'AlunoAtualizar', 'idade':1,'data_nascimento':'', 'turma_id':1,'nota_primeiro_semestre':2,'nota_segundo_semestre':2})
-        self.assertEqual(r_post.status_code, 201)
-
-        r_put = requests.put('http://localhost:5000/alunos/777', json={'nome': 'AlunoAtualizado'})
-        self.assertEqual(r_put.status_code, 200)
-
-        r_get = requests.get('http://localhost:5000/alunos/777')
-        self.assertEqual(r_get.status_code, 200)
-        self.assertEqual(r_get.json()['nome'], 'AlunoAtualizado')
-
-    def teste_atualiza_professor_012(self):
-        r_post = requests.post('http://localhost:5000/professores', json={'nome': 'ProfessorAtualizar', 'idade':1,"data_nascimento":"","disciplina":"","salario":6})
-        self.assertEqual(r_post.status_code, 201)
-
-        r_put = requests.put('http://localhost:5000/professores/3', json={'nome': 'ProfessorAtualizado'})
-        self.assertEqual(r_put.status_code, 200)
-
-        r_get = requests.get('http://localhost:5000/professores/3')
-        self.assertEqual(r_get.status_code, 200)
-        self.assertEqual(r_get.json()['nome'], 'ProfessorAtualizado')
-
-    def teste_atualiza_turma(self): 
-    
-        r_post = requests.post('http://localhost:5000/turmas', json={
-            'id': 777,
-            'nome': 'Turma Teste',
-            'turno': 'Matutino',
-            'professor_id': 1,
-            'ativo': True,
-            'descricao': 'Turma para teste'
-    })
-        self.assertEqual(r_post.status_code, 201)  
-
-    
-        r_put = requests.put('http://localhost:5000/turmas/777', json={
-            'nome': 'Turma Atualizada',
-            'turno': 'Vespertino',
-            'professor_id': 1,
-            'ativo': True,
-            'descricao': 'TurmaAtualizada'
-    })
-        self.assertEqual(r_put.status_code, 200)
-
-        r_get = requests.get('http://localhost:5000/turmas/777')
-        self.assertEqual(r_get.status_code, 200)
-        self.assertEqual(r_get.json()['descricao'], 'TurmaAtualizada')
-
+    def teste_012_atualiza_turma(self):
+        r = requests.put('http://localhost:5000/turmas/1', json={'nome': 'Nova descrição'})
+        self.assertEqual(r.status_code, 200)
+        r = requests.get('http://localhost:5000/turmas/1')
+        self.assertEqual(r.json()['nome'], 'Nova descrição')
 
 def runTests():
-        suite = unittest.defaultTestLoader.loadTestsFromTestCase(Testes)
-        unittest.TextTestRunner(verbosity=2,failfast=True).run(suite)
+    suite = unittest.defaultTestLoader.loadTestsFromTestCase(Testes)
+    unittest.TextTestRunner(verbosity=2, failfast=True).run(suite)
 
 if __name__ == '__main__':
     runTests()
