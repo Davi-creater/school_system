@@ -36,3 +36,10 @@ class ProfessoresResource(Resource):
         data = professor_ns.payload
         response, status_code = createProfessor(data)
         return response, status_code
+
+@professor_ns.route("/<int:id_professor>")
+class ProfessorIdResource(Resource):
+    @professor_ns.marshal_with(professor_output_model)
+    def get(self, id_professor):
+        """Obtém um professor pelo ID"""
+        return getProfessorId(id_professor)
