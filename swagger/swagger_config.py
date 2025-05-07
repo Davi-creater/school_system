@@ -1,4 +1,4 @@
-from swagger import api
+from . import api
 from swagger.namespaces.aluno_namespace import alunos_ns
 from swagger.namespaces.professor_namespace import professor_ns
 from swagger.namespaces.turma_namespace import turmas_ns
