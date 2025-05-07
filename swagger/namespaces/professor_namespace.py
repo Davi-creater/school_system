@@ -43,3 +43,15 @@ class ProfessorIdResource(Resource):
     def get(self, id_professor):
         """Obtém um professor pelo ID"""
         return getProfessorId(id_professor)
+    
+    @professor_ns.expect(professor_model)
+    def put(self, id_professor):
+        """Atualiza professor pelo ID"""
+        data = professor_ns.payload
+        updateProfessor(id_professor, data)
+        return data, 200
+    
+    def delete(self, id_professor):
+        """Exclui professor pelo ID"""
+        deleteProfessor(id_professor)
+        return {"message": "Professor excluído com sucesso"}, 200
